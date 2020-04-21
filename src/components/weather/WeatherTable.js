@@ -12,7 +12,19 @@ import React, {Fragment} from "react";
 import {WeatherTableRow} from "./WeatherTableRow";
 import TablePagination from '@material-ui/core/TablePagination';
 
-export const WeatherTable = ({weatherData, handleEdit, handleDelete }) => {
+export const WeatherTable = ({
+                                 weatherData,
+                                 handleEdit,
+                                 handleDelete,
+                                 pagination,
+                                 changePage,
+                                 changeRowsPerPage
+                             }) => {
+    const {
+        totalItems,
+        itemsPerPage,
+        page
+    } = pagination
     return (
         <Fragment>
             <TableContainer component={Paper}>
@@ -39,11 +51,11 @@ export const WeatherTable = ({weatherData, handleEdit, handleDelete }) => {
                 className="weatherTablePagination"
                 rowsPerPageOptions={[5, 10, 25]}
                 component="div"
-                count={30}
-                rowsPerPage={10}
-                page={1}
-//                onChangePage={handleEdit}
-//                onChangeRowsPerPage={handleEdit}
+                count={totalItems}
+                rowsPerPage={itemsPerPage}
+                page={page}
+                onChangePage={() => changePage(page + 1)}
+                onChangeRowsPerPage={() => changeRowsPerPage(itemsPerPage)}
                 style={{ marginRight: "60px"}}
             />
         </Fragment>
