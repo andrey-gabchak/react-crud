@@ -1,84 +1,78 @@
-import React, {Fragment} from 'react';
-import {makeStyles} from '@material-ui/core/styles';
-import Drawer from '@material-ui/core/Drawer';
-import List from '@material-ui/core/List';
-import ListItem from '@material-ui/core/ListItem';
-import ListItemIcon from '@material-ui/core/ListItemIcon';
-import ListItemText from '@material-ui/core/ListItemText';
-import IconButton from "@material-ui/core/IconButton";
+import React, {Component, Fragment} from 'react';
+import {
+    Drawer, ListItemIcon, ListItemText, IconButton, MenuList, MenuItem
+} from '@material-ui/core'
 import MenuIcon from "@material-ui/icons/Menu";
 import WbSunnyIcon from '@material-ui/icons/WbSunny';
 import AssessmentIcon from '@material-ui/icons/Assessment';
 import StorageIcon from '@material-ui/icons/Storage';
+import {BrowserRouter, Link } from "react-router-dom";
 
-const useStyles = makeStyles((theme) => ({
-    list: {
-        width: 250,
-    },
-    fullList: {
-        width: 'auto',
-    },
-    menuButton: {
-        marginRight: theme.spacing(2),
-    },
-}));
+class NavMenuDrawer extends Component {
+    state = {
+        isOpen: false
+    }
 
-export default function NavMenuDrawer() {
-    const classes = useStyles();
-    const [state, setState] = React.useState({
-        anchor: false,
-    });
+    toggleDrawer = () => {
+        this.setState(state => ({
+            ...state, isOpen: !state.isOpen
+        }))
+    }
 
-    const toggleDrawer = () => (event) => {
-        if (event.type === 'keydown' && (event.key === 'Tab' || event.key === 'Shift')) {
-            return;
-        }
+    render() {
+        const list = () => (
+            <div
+                role="presentation"
+            >
+                <BrowserRouter>
+                    <MenuList>
+                        <MenuItem
+                            component={Link}
+                            to="/weather-forecasting"
+                        >
+                            <ListItemIcon> <WbSunnyIcon/></ListItemIcon>
+                            <ListItemText>Weather forecasting</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                            component={Link}
+                            to="/"
+                        >
+                            <ListItemIcon> <StorageIcon/></ListItemIcon>
+                            <ListItemText>Weather data</ListItemText>
+                        </MenuItem>
+                        <MenuItem
+                            component={Link}
+                            to="/analytics">
+                            <ListItemIcon> <AssessmentIcon/></ListItemIcon>
+                            <ListItemText>Analytics</ListItemText>
+                        </MenuItem>
+                    </MenuList>
+                </BrowserRouter>
+            </div>
+        );
 
-        setState({ ...state, anchor: !state.anchor });
-    };
-
-    const list = () => (
-        <div
-            className={classes.list}
-            role="presentation"
-        >
-            <List>
-                <ListItem button >
-                    <ListItemIcon> <WbSunnyIcon /></ListItemIcon>
-                    <ListItemText>Weather forecasting</ListItemText>
-                </ListItem>
-                <ListItem button >
-                    <ListItemIcon> <StorageIcon /></ListItemIcon>
-                    <ListItemText>Weather data</ListItemText>
-                </ListItem>
-                <ListItem button >
-                    <ListItemIcon> <AssessmentIcon /></ListItemIcon>
-                    <ListItemText>Analytics</ListItemText>
-                </ListItem>
-            </List>
-        </div>
-    );
-
-    return (
-        <div>
-            <Fragment key="MenuDrawer">
-                <IconButton
-                    edge="start"
-                    className={classes.menuButton}
-                    color="inherit"
-                    aria-label="menu"
-                    onClick={toggleDrawer()}
-                >
-                    <MenuIcon />
-                </IconButton>
-                <Drawer
-                    anchor="left"
-                    open={state.anchor}
-                    onClose={toggleDrawer()}
-                >
-                    {list()}
-                </Drawer>
-            </Fragment>
-        </div>
-    );
+        return (
+            <BrowserRouter>
+                <Fragment key="MenuDrawer">
+                    <IconButton
+                        edge="start"
+                        color="inherit"
+                        aria-label="menu"
+                        onClick={this.toggleDrawer}
+                    >
+                        <MenuIcon/>
+                    </IconButton>
+                    <Drawer
+                        anchor="left"
+                        open={this.state.isOpen}
+                        onClose={this.toggleDrawer}
+                    >
+                        {list()}
+                    </Drawer>
+                </Fragment>
+            </BrowserRouter>
+        )
+    }
 }
+
+export default NavMenuDrawer

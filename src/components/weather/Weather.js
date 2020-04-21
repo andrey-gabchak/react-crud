@@ -23,13 +23,69 @@ class Weather extends Component {
         },
         pagination: {
             totalItems: 0,
-            totalPages: 0,
             itemsPerPage: 10,
             page: 0
+        },
+        errors: {
+            temperature: false,
+            pressure: false,
+            humidity: false,
+            airQuality: false,
+            windSpeed: false,
         }
     }
 
-    handleInputChange = (event) => {
+    validation = (data) => {
+        if (data.temperature > 100 || data.temperature < -100) {
+            this.setState(state => ({
+                ...state,
+                errors: {
+                    temperature: true
+                }
+            }))
+            return false;
+        }
+
+        if (data.pressure < 0) {
+            this.setState(state => ({
+                ...state,
+                errors: {
+                    pressure: true
+                }
+            }))
+            return false;
+        }
+        if (data.humidity < 0) {
+            this.setState(state => ({
+                ...state,
+                errors: {
+                    humidity: true
+                }
+            }))
+            return false;
+        }
+        if (data.airQuality < 0) {
+            this.setState(state => ({
+                ...state,
+                errors: {
+                    airQuality: true
+                }
+            }))
+            return false;
+        }
+        if (data.windSpeed < 0) {
+            this.setState(state => ({
+                ...state,
+                errors: {
+                    windSpeed: true
+                }
+            }))
+            return false;
+        }
+        return true
+    }
+
+    handleInputWeatherItemChange = (event) => {
         const target = event.target;
         const value = target.value;
         const id = target.id;
@@ -38,22 +94,27 @@ class Weather extends Component {
             selectedData: {
                 ...state.selectedData,
                 [id]: value
+            },
+            errors: {
+                [id]: false
             }
         }))
     }
 
-    handleToggle = () => {
+    toggleWeatherDialog = () => {
         this.setState({
             open: !this.state.open
         })
     };
 
-    handleSubmit = (data) => {
-        this.handleSaveRequest(data)
-        this.handleToggle()
+    handleWeatherItemSubmit = (data) => {
+        if (this.validation(data)) {
+            this.saveWeatherItem(data);
+            this.toggleWeatherDialog()
+        }
     }
 
-    handleSaveRequest = (data) => {
+    saveWeatherItem = (data) => {
         let methodType = data.id ? 'PUT' : 'POST';
         const requestOptions = {
             method: methodType,
@@ -63,11 +124,11 @@ class Weather extends Component {
         fetch(API_CRUD, requestOptions)
             .then(response => response.json())
             .then(data => {
-                this.updateWeatherState(data)
+                this.updateWeatherTableState(data)
             });
     }
 
-    updateWeatherState = (data) => {
+    updateWeatherTableState = (data) => {
         let weatherData = [...this.state.weatherData]
         const index = weatherData.findIndex(elem => elem.id === data.id)
         let updatedWeatherData = [...weatherData]
@@ -82,36 +143,28 @@ class Weather extends Component {
         }))
     }
 
-    handleEdit = (data) => {
+    handleEditTableItem = (data) => {
         this.setState(state => ({
             ...state,
             selectedData: data
         }))
-        this.handleToggle();
+        this.toggleWeatherDialog();
     }
 
-    handleCreate = () => {
+    handleCreateTableItem = () => {
         this.setState(state => ({
             ...state,
             selectedData: EMPTY_WEATHER_DATA
         }))
-        this.handleToggle();
+        this.toggleWeatherDialog();
     }
 
-    handleDelete = (id) => {
-        this.handleDeleteRequest(id)
-        this.setState(state => ({
-            ...state,
-            deleteId: id
-        }))
-    }
-
-    handleDeleteRequest = (id) => {
+    deleteTableItem = (id) => {
         const requestOptions = {
             method: 'DELETE',
             headers: {'Content-Type': 'application/json/'},
         };
-        fetch({...API_CRUD} + id, requestOptions)
+        fetch(API_CRUD + id, requestOptions)
             .then(() => {
                 let updateData = [...this.state.weatherData].filter(i => i.id !== id);
                 this.setState({weatherData: updateData})
@@ -131,7 +184,6 @@ class Weather extends Component {
                     weatherData: body.content,
                     pagination: {
                         totalItems: body.totalElements,
-                        totalPages: body.totalPages,
                         itemsPerPage: body.size,
                         page: body.number
                     }
@@ -168,22 +220,24 @@ class Weather extends Component {
         this.getWeatherDataListBetweenDates()
     }
 
-    handlePageChange = (next) => {
-        console.log(next)
-        this.setState({
-            page: next
-        })
-        console.log(this.state.pagination.page)
-        if (0 !== this.state.pagination.page) {
-            this.getWeatherDataListBetweenDates();
-        }
+    handlePagination = (event, page) => {
+        this.setState(state => ({
+            ...state,
+            pagination: {
+                ...state.pagination,
+                page: page
+            }
+        }), () => this.getWeatherDataListBetweenDates())
     }
 
-    handleItemsPerPageChange = (items) => {
-        this.setState({
-            itemsPerPage: items
-        })
-        console.log(this.state)
+    handleItemsPerPageChange = (event) => {
+        this.setState(state => ({
+            ...state,
+            pagination: {
+                ...state.pagination,
+                itemsPerPage: event.target.value
+            }
+        }), () => this.getWeatherDataListBetweenDates())
     }
 
     render() {
@@ -198,20 +252,21 @@ class Weather extends Component {
                 {weatherData && weatherData.length > 0 ? (
                     <WeatherTable
                         weatherData={weatherData}
-                        handleEdit={this.handleEdit}
-                        handleDelete={this.handleDelete}
+                        handleEdit={this.handleEditTableItem}
+                        handleDelete={this.deleteTableItem}
                         pagination={this.state.pagination}
-                        changePage={this.handlePageChange}
+                        changePage={this.handlePagination}
                         changeRowsPerPage={this.handleItemsPerPageChange}
                     />
                 ) : NoDataMessage}
-                <WeatherCreateButton handleCreate={this.handleCreate}/>
+                <WeatherCreateButton handleCreate={this.handleCreateTableItem}/>
                 <WeatherDialog
-                    handleToggle={this.handleToggle}
-                    handleSubmit={this.handleSubmit}
-                    handleInputChange={this.handleInputChange}
+                    handleToggle={this.toggleWeatherDialog}
+                    handleSubmit={this.handleWeatherItemSubmit}
+                    handleInputChange={this.handleInputWeatherItemChange}
                     open={open}
                     weatherDataItem={selectedData}
+                    errors={this.state.errors}
                 />
             </Fragment>
         );

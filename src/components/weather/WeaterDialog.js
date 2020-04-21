@@ -17,11 +17,14 @@ const useStyles = makeStyles(() => ({
     },
 }));
 
-export const WeatherDialog = ({handleToggle,
-                              handleSubmit,
-                              handleInputChange,
-                              open,
-                              weatherDataItem = {EMPTY_WEATHER_DATA}}) => {
+export const WeatherDialog = ({
+                                  handleToggle,
+                                  handleSubmit,
+                                  handleInputChange,
+                                  open,
+                                  weatherDataItem = {EMPTY_WEATHER_DATA},
+                                  errors
+                              }) => {
     let title = (weatherDataItem.id === '' ? 'Create a new ' : 'Edit the ') + 'weather data';
     const classes = useStyles();
     return (
@@ -46,6 +49,9 @@ export const WeatherDialog = ({handleToggle,
                             type="number"
                             value={weatherDataItem.temperature}
                             onChange={handleInputChange}
+                            error={errors.temperature}
+                            helperText={errors.temperature ?
+                                'The value must be between -100 and 100 C' : ''}
                         />
                         <br/>
                         <TextField
@@ -55,6 +61,9 @@ export const WeatherDialog = ({handleToggle,
                             type="number"
                             value={weatherDataItem.pressure}
                             onChange={handleInputChange}
+                            error={errors.pressure}
+                            helperText={errors.pressure ?
+                                'The value must be positive' : ''}
                         />
                         <br/>
                         <TextField
@@ -64,6 +73,9 @@ export const WeatherDialog = ({handleToggle,
                             type="number"
                             value={weatherDataItem.humidity}
                             onChange={handleInputChange}
+                            error={errors.humidity}
+                            helperText={errors.humidity ?
+                                'The value must be positive' : ''}
                         />
                         <br/>
                         <TextField
@@ -73,6 +85,9 @@ export const WeatherDialog = ({handleToggle,
                             type="number"
                             value={weatherDataItem.airQuality}
                             onChange={handleInputChange}
+                            error={errors.airQuality}
+                            helperText={errors.airQuality ?
+                                'The value must be positive' : ''}
                         />
                         <br/>
                         <TextField
@@ -82,6 +97,9 @@ export const WeatherDialog = ({handleToggle,
                             type="number"
                             value={weatherDataItem.windSpeed}
                             onChange={handleInputChange}
+                            error={errors.windSpeed}
+                            helperText={errors.windSpeed ?
+                                'The value must be positive' : ''}
                         />
                         <br/>
                         <TextField

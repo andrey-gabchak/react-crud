@@ -1,18 +1,19 @@
 import React, {Fragment} from "react";
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom'
+import {BrowserRouter, Route, Switch} from 'react-router-dom'
 import Weather from "./components/weather/Weather"
 import NavBar from "./layouts/NavBar";
+import PageNotFound from "./layouts/PageNotFound";
 
 const AppRouter = () => {
     return(
         <Fragment>
             <NavBar />
-
-            <Router>
+            <BrowserRouter>
                 <Switch>
                     <Route path="/" exact component={Weather} />
+                    <Route component={PageNotFound} />
                 </Switch>
-            </Router>
+            </BrowserRouter>
         </Fragment>
     )
 }

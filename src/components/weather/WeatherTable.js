@@ -10,7 +10,7 @@ import {
 import {WEATHER_TABLE_HEADERS} from "./Constants";
 import React, {Fragment} from "react";
 import {WeatherTableRow} from "./WeatherTableRow";
-import TablePagination from '@material-ui/core/TablePagination';
+import {WeatherTablePagination} from "./TablePagination";
 
 export const WeatherTable = ({
                                  weatherData,
@@ -20,11 +20,6 @@ export const WeatherTable = ({
                                  changePage,
                                  changeRowsPerPage
                              }) => {
-    const {
-        totalItems,
-        itemsPerPage,
-        page
-    } = pagination
     return (
         <Fragment>
             <TableContainer component={Paper}>
@@ -47,16 +42,10 @@ export const WeatherTable = ({
                     </TableBody>
                 </Table>
             </TableContainer>
-            <TablePagination
-                className="weatherTablePagination"
-                rowsPerPageOptions={[5, 10, 25]}
-                component="div"
-                count={totalItems}
-                rowsPerPage={itemsPerPage}
-                page={page}
-                onChangePage={() => changePage(page + 1)}
-                onChangeRowsPerPage={() => changeRowsPerPage(itemsPerPage)}
-                style={{ marginRight: "60px"}}
+            <WeatherTablePagination
+                pagination={pagination}
+                changePage={changePage}
+                changeRowsPerPage={changeRowsPerPage}
             />
         </Fragment>
     )
